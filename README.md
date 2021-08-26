@@ -1,9 +1,94 @@
 # TIL
 21.07.06 ~ 
 
-| 날짜                     | 내용                                                         |
-| ------------------------ | ------------------------------------------------------------ |
-| [21. 07. 06(화)](210706) | - Django REST framework 정리                                 |
-| [21. 07. 07(수)](210707) | - Docker<br />- 알고리즘 (큐덱, 분할정복)<br />- Curved Active Tab (CSS) |
-| [21. 07. 08(목)]()       | - OSI (Physical layer / Datalink layer)                      |
+## Computer science
+
+- OSI 7계층
+
+
+
+## Django
+
+- Django REST framework
+
+
+
+## Vue
+
+- JSON WebToken
+- Modal Container 밖 선택 시 닫기 구현
+  - Event handler
+    - Modifier
+  - Click & Mousedown
+
+- Vue Router
+  - Lazy Loading Routes
+  - 404Page 구현
+  - 뒤로가기 구현
+
+- vue.config.js
+  - devServer
+    - https
+    - open
+    - port
+    - proxy
+
+
+
+## JavaScript
+
+- Javascript sort array of objects by a boolean property
+
+
+
+## CSS
+
+- Navigation Menu
+- CSS로 스크롤바 없애기
+
+
+
+## Python
+
+### NIPA_AI 교육과정
+
+- Numpy
+  - Numpy를 사용하는 이유
+  - Python List vs Numpy
+  - 배열의 기초
+  - Indexing & Slicing
+
+
+
+## Docker
+
+- Docker의 도입 배경
+
+
+
+## Algorithm
+
+
+
+## WebRTC & WebSocket
+
+
+
+
+
+## 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
