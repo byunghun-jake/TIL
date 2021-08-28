@@ -108,6 +108,9 @@ print(x[7]) # 아무것도 출력되지 않음
 
 x[0] = 10
 print(x) # [10 1 2 3 4 5 6]
+```
+
+```python
 x = np.arange(1, 13, 1) # 1 ~ 12까지 1씩 증가
 x.shape = 3, 4          # 3 X 4 행렬로 변환
 print(x)
@@ -117,3 +120,135 @@ print(x)
 
 print(x[2, 3]) # 12
 ```
+
+
+
+### slicing
+
+인덱스의 값으로 배열의 일부분을 가져옴
+
+`[start:end:step]`: start 이상 end 미만의 값을 step 간격으로
+
+```python
+x = np.arrange(7)
+print(x) # [0 1 2 3 4 5 6]
+
+print(x[1:4]) # [1 2 3]
+print(x[1:]) # [1 2 3 4 5 6]
+print(x[:4]) # [0 1 2 3]
+print(x[::2]) # [0 2 4 6]
+```
+
+
+
+```python
+x = np.arrange(1, 13, 1)
+x.shape = 3, 4
+print(x)
+# [[1 2 3 4],
+#  [5 6 7 8],
+#  [9 10 11 12]]
+print(x[1:2, :2:3])
+# [[5]]
+print(x[1:, :2])
+# [[5 6],
+#  [9 10]]
+```
+
+
+
+### Boolean indexing
+
+배열의 각 요소 선택 여부를 Boolean mask를 이용하여 지정하는 방식
+
+조건을 충족하는지 확인한다.
+
+- `조건`: 조건을 만족하는지 확인하여 T/F를 리턴
+- `array[조건]`: 조건을 만족하는 값만 리턴
+
+```python
+x = np.arrange(7)
+
+print(x)
+# [0 1 2 3 4 5 6 7]
+
+print(x < 3)
+# [True True True False False False False False]
+print(x[x < 3])
+# [0 1 2]
+
+print(x > 7)
+# [False False False False False False False]
+print(x[x > 7])
+# []
+```
+
+
+
+### Fancy indexing
+
+배열의 각 요소 선택을 index 배열을 전달하여 지정하는 방식
+
+> 2차원은 행을 선택하는 것
+
+```python
+x = np.arange(6, -1, -1)
+print(x)
+# [6 5 4 3 2 1 0]
+
+print(x[[1, 3, 5]])
+# [5 3 1]
+```
+
+```python
+x = np.arange(1, 13, 1).reshape(3, 4)
+
+print(x[[0, 2]])
+# [[1 2 3 4],
+#  [9 10 11 12]]
+```
+
+
+
+# Pandas
+
+jupyter 참고
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
