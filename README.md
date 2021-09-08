@@ -3,6 +3,7 @@
 
 ## [Computer science](./CS)
 
+- HTTP와 HTTPS의 차이
 - OSI 7계층
 
 
@@ -39,6 +40,8 @@
 ## [JavaScript](./JS)
 
 - Javascript sort array of objects by a boolean property
+- Deep Dive
+  - 12장 - 함수
 
 
 
