@@ -1,19 +1,19 @@
 # TIL
 21.07.06 ~ 
 
-## Computer science
+## [Computer science](./CS)
 
 - OSI 7계층
 
 
 
-## Django
+## [Django](./Django)
 
 - Django REST framework
 
 
 
-## Vue
+## [Vue](./Vue)
 
 - JSON WebToken
 
@@ -36,22 +36,22 @@
 
 
 
-## JavaScript
+## [JavaScript](./JS)
 
 - Javascript sort array of objects by a boolean property
 
 
 
-## CSS
+## [CSS](./CSS)
 
 - Navigation Menu
 - CSS로 스크롤바 없애기
 
 
 
-## Python
+## [Python](./Python)
 
-### NIPA_AI 교육과정
+### [NIPA_AI 교육과정](./Python/NIPA_AI)
 
 - Numpy
   - Numpy를 사용하는 이유
@@ -61,35 +61,16 @@
 
 
 
-## Docker
+## [Docker](./Docker)
 
 - Docker의 도입 배경
 
 
 
-## Algorithm
+## [WebRTC & WebSocket](./WebSocket)
 
 
 
-## WebRTC & WebSocket
+## [기타](./etc)
 
-
-
-
-
-## 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- 블록체인

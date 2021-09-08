@@ -919,7 +919,302 @@ for tc in range(1, T + 1):
 
 
 
+# Programmers
 
 
 
+## Lv 1
+
+### 비밀지도
+
+#### 핵심 포인트
+
+- 이진수 변환 방법을 아는가?
+
+#### 내 코드
+
+```python
+def d_to_b(n, num):
+    # n: number(10진수)
+    binary_text = format(num, "b")
+    l = n - len(binary_text)
+    binary_text = "0" * l + binary_text
+    return binary_text
+
+
+def solution(n, arr1, arr2):
+    answer = []
+    # 숫자 배열을 이진수로 변환한다.
+    bi_arr1 = []
+    bi_arr2 = []
+    for i in range(n):
+        # 변환한 이진수를 배열에 저장한다.
+        bi_arr1.append(d_to_b(n, arr1[i]))
+        bi_arr2.append(d_to_b(n, arr2[i]))
+    # 두 배열을 인덱스로 순회하며, 새로운 배열을 만든다.
+    for i in range(n):
+        temp_row = ""
+        for j in range(n):
+            # 벽은 "#"으로, 공백(0)은 " "으로 저장한다.
+            temp = " "
+            # 새로운 배열을 만들 때, 어느 하나라도 벽(1)인 부분이 있다면 벽이다.
+            if bi_arr1[i][j] == "1" or bi_arr2[i][j] == "1":
+                temp = "#"
+            temp_row += temp
+        # row 단위로 만들어진 문자열을 저장한다.
+        answer.append(temp_row)
+    print(arr1, arr2)
+    return answer
+
+
+print(solution(6, [46, 33, 33 ,22, 31, 50], [27 ,56, 19, 14, 14, 10]))
+```
+
+
+
+#### 다른 사람 코드 1
+
+- zip
+
+- format 활용
+
+  `f."{x:016b}"`
+
+```python
+def solution(n, *maps):
+    return [line(n, a | b) for a, b in zip(*maps)]
+
+
+def line(n, x):
+    return ''.join(' #'[int(i)] for i in f'{x:016b}'[-n:])
+
+
+def test_sample():
+    assert solution(5, [9, 20, 28, 18, 11], [30, 1, 21, 17, 28]) == [
+        '#####',
+        '# # #',
+        '### #',
+        '#  ##',
+        '#####',
+    ]
+    assert solution(6, [46, 33, 33, 22, 31, 50], [27, 56, 19, 14, 14, 10]) == [
+        '######',
+        '###  #',
+        '##  ##',
+        ' #### ',
+        ' #####',
+        '### # ',
+    ]
+
+
+def test_line():
+    assert line(5, 9) == ' #  #'
+    assert line(5, 30) == '#### '
+    assert line(5, 9 | 30) == '#####'
+```
+
+
+
+
+
+### 상호평가
+
+#### 핵심 포인트
+
+- 주어진 2차원 배열을 Transpose할 수 있는가?
+
+#### 내 코드
+
+```python
+def grading(score):
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 50:
+        return "D"
+    return "F"
+
+
+def solution(scores):
+    answer = ''
+    mean_arr = []
+    # 자기 자신을 평가한 점수가 자기가 받은 점수 중 유일한 최고점 또는 유일한 최저점일 때 그 점수는 제외한다.
+    scores_t = []
+    l = len(scores)
+    for c in range(l):
+        score_list = []
+        for r in range(l):
+            score_list.append(scores[r][c])
+        # 내가 준 점수와 최저점 / 최고점 비교
+        min_score = min(score_list)
+        max_score = max(score_list)
+        score_sum = sum(score_list)
+        student_count = l
+        if score_list[c] == min_score and score_list.count(min_score) == 1:
+            score_sum -= min_score
+            student_count -= 1
+        elif score_list[c] == max_score and score_list.count(max_score) == 1:
+            score_sum -= max_score
+            student_count -= 1
+        mean_score = score_sum / student_count
+        answer += grading(mean_score)
+
+    return answer
+```
+
+
+
+#### 다른 사람 코드 1
+
+- enumerate
+- zip
+
+```python
+def get_grade(score):
+    if score >= 90 :
+        return 'A'
+    elif score >= 80:
+        return 'B'
+    elif score >= 70:
+        return 'C'
+    elif score >= 50:
+        return 'D'
+    else:
+        return 'F'
+
+def solution(scores):
+    score_table = list(map(list, zip(*scores)))
+    for i, scores in enumerate(score_table):
+        min_value, max_value = min(scores), max(scores)
+        if scores.count(scores[i]) == 1:
+            if scores[i] == min_value or scores[i] == max_value:
+                scores.pop(i)
+    return ''.join(map(lambda x : get_grade(sum(x) / len(x)), score_table))
+```
+
+
+
+#### 다른 사람 코드 2
+
+- transpose 방법
+
+```python
+def solution(scores) :
+
+    avgs=[]
+
+    score=[ [i[j] for i in scores] for j in range(len(scores))]
+
+    for idx,i in enumerate(score) :
+
+        avg=sum(i) ; length=len(i)
+
+        if i[idx] == max(i) or i[idx] == min(i) :
+
+            if i.count(i[idx]) == 1 :
+
+                avg-=i[idx] ; length-=1
+
+        avgs.append(avg/length)
+
+    return "".join([ avg>=90 and "A" or avg>=80 and "B" or avg>=70 and "C" or avg>=50 and "D" or "F" for avg in avgs ])
+```
+
+
+
+#### 다른 사람 코드 3
+
+- Counter
+
+```python
+from collections import Counter
+def solution(scores):   
+    answer = ''
+
+    for idx, score in enumerate(list(map(list, zip(*scores)))):
+        length = len(score)
+        if Counter(score)[score[idx]] == 1 and (max(score) == score[idx] or min(score) == score[idx]):
+            del score[idx]
+            length -= 1
+
+        grade = sum(score) / length
+
+        if grade >= 90:
+            answer += 'A'
+        elif grade >= 80:
+            answer += 'B'
+        elif grade >= 70:
+            answer += 'C'
+        elif grade >= 50:
+            answer += 'D'
+        else:
+            answer += 'F'
+
+    return answer
+```
+
+
+
+### 직업군 추천하기
+
+#### 핵심 포인트
+
+- list에서 value를 이용해 index 찾기
+- zip 활용
+
+#### 내 코드
+
+- `Array.sort(key=lambda x: (-x[1], x[0]))`
+- `value in arr` & `arr.index(value)`
+
+```python
+def solution(table, languages, preference):
+    answer = ''
+    score_list = []
+    for i in range(5):
+        area_list = table[i].split()
+        # 가지고 있는 언어에 따른 점수 계산
+        score = 0
+        for i in range(len(languages)):
+            lan = languages[i]
+            # list에 존재하는 지 확인 (index 메서드 에러 방지)
+            if lan in area_list:
+                score += (6 - area_list.index(lan)) * preference[i]
+        score_list.append((area_list[0], score))
+    # score_list 정렬
+    score_list.sort(key=lambda x: (-x[1], x[0]))
+    print(score_list)
+    answer = score_list[0][0]
+    return answer
+```
+
+
+
+#### 다른 사람 코드 1
+
+- dictionary로 데이터를 저장하고, get을 통해 가져오는 방식
+- zip 함수 사용
+
+```python
+def solution(table, languages, preference):
+    answer = 'ZZZZZZZZ'
+    score_dic = {lang: score for lang, score in zip(languages, preference)}
+    max_score = 0
+    for row in table:
+        r = row.split(' ')
+        curr_score = 0
+        for i in range(1, len(r)):
+            curr_score += score_dic.get(r[i], 0) * (6-i)
+        if max_score < curr_score:
+            max_score = curr_score
+            answer = r[0]
+        elif max_score == curr_score and answer > r[0]:
+            answer = r[0]
+
+
+    return answer
+```
 
