@@ -2,6 +2,16 @@
 
 
 
+## HTTP란?
+
+
+
+### 참고
+
+[블로그 - 프런트엔드 개발자가 알아야하는 HTTP 프로토콜 Part 1 - 캡틴판교](https://joshua1988.github.io/web-development/http-part1/)
+
+
+
 ## HTTP와 HTTPS의 차이
 
 ### HTTP
@@ -32,6 +42,14 @@ HTTPS는 HTTP + Secure. 즉, HTTP에서 보안이 더해진 것으로 데이터�
 3. 클라이언트는 handshake 과정에서 주고 받았던 클라이언트의 랜덤한 데이터 + 서버의 랜덤한 데이터 + 서버의 공개 키를 이용해서 임시키를 발급하고, 서버에게 전달합니다.
    - 일련의 과정을 거쳐 대칭키를 생성합니다.
 4. 대칭키를 통해 데이터를 암호화하여 주고 받습니다.
+
+
+
+### 참고
+
+[블로그 - HTTPS와 SSL 인증서 - 뇽뇽냥냥늉늉](https://nyeongnyeong.tistory.com/266)
+
+[Youtube - HTTPS가 뭐고 왜 쓰나요? (Feat. 대칭키 vs. 비대칭키) - 얄팍한 코딩사전](https://youtu.be/H6lpFRpyl14)
 
 
 
