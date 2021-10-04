@@ -774,9 +774,21 @@ ax.plot(
 
 
 
+#  Error
 
 
 
+## Pandas
+
+
+
+### DtypeWarning
+
+> DtypeWarning: Columns (4,6) have mixed types.Specify dtype option on import or set low_memory=False.
+
+한 컬럼에 NaN 값이나, 여러 타입의 데이터가 섞여있는 경우 나타나는 경고 메세지이다.
+
+파일을 읽을 때, low_memory=False 옵션을 넣어주면 경고 메세지가 출력되지 않는다.
 
 
 
