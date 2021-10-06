@@ -133,3 +133,60 @@
 /\d{2,3}[-. ]\d{3}[-. ]\d{4}/gm
 ```
 
+
+
+#### 2. 이메일 체크
+
+```
+dream.coder.ellie@gmail.com
+hello@daum.net
+hello@daum.co.kr
+```
+
+```
+/([a-zA-Z0-9._+-]+)@([a-zA-Z0-9-]+)\.([a-z]+[.a-z]*)/gm
+```
+
+
+
+#### 3. 주소에서 특정 부분 추출하기
+
+```
+https://www.youtu.be/-ZClicWm0zM
+https://youtu.be/-ZClicWm0zM
+youtu.be/-ZClicWm0zM
+```
+
+```
+/(https?:\/\/)?(www\.)?(youtu.be\/)([a-zA-Z0-9-]{11})/gm
+```
+
+필요 없는 그룹 제외하기
+
+```
+/(?:https?:\/\/)?(?:www\.)?(?:youtu.be\/)([a-zA-Z0-9-]{11})/gm
+```
+
+
+
+### JavaScript에서 정규표현식 사용
+
+```javascript
+const regex = /([a-zA-Z0-9._+-]+)@([a-zA-Z0-9-]+)\.([a-z]+[.a-z]*)/
+
+const email = "dream.coder.ellie@gmail.com"
+
+const match = email.match(regex)
+console.log(match)
+// ["dream.coder.ellie@gmail.com", "dream.coder.ellie", "gmail", "com"]
+// [전체 문자열, 그룹 1, 그룹 2, 그룹 3]
+```
+
+
+
+### 참고 링크
+
+- 정규 표현식 문제를 풀고 싶다면?
+
+  https://regexone.com/
+
