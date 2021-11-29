@@ -16,6 +16,57 @@ console.log(a);
 
 
 
+# DreamCoding
+
+## Event
+
+### Event bubbling & Event capturing
+
+부모 요소에서 자식 요소로 (실제 이벤트가 발생한 위치까지) 찾아가는 것: 이벤트 캡처링
+
+자식 요소에서 발생한 이벤트가 부모 요소로 전달되어 확산되는 것: 이벤트 버블링
+
+### Event delegation (이벤트 위임)
+
+> 공통 부모 안에 여러 자식 요소에 이벤트를 등록해야 하는 경우, 직접 자식에게 이벤트를 등록하지 않고 부모 요소에 이벤트를 등록해 target을 이용하여 이벤트를 핸들링하는 방법
+
+```html
+<html>
+    <body>
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+        </ul>
+    </body>
+    <script>
+    	// bad
+        const lis = document.querySelectorAll("li")
+        lis.forEach(li => {
+            li.addEventListener("click", () => {
+                li.classList.toggle("selected")
+            })
+        })
+        // Good
+        const ul = document.querySelector("ul")
+        ul.addEventListener("click", (event) => {
+          console.log(event.target.tagName)
+          const target = event.target.closest("li")
+          if (target) {
+            target.classList.toggle("selected")
+          }
+        })
+    </script>
+</html>
+```
+
+
+
+
+
+
+
 # DeepDive
 
 
