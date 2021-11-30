@@ -565,23 +565,230 @@ console.log(x)	// global
 
    
 
+## 15장 let, const 키워드와 블록 레벨 스코프
+
+### 1. var 키워드로 선언한 변수의 문제점
+
+1. 변수 중복 선언 허용
+
+   ```javascript
+   var x = 1
+   
+   var x = 100
+   
+   console.log(x) // 100
+   ```
+
+   > 이미 선언된 변수를 재선언하며, 문제가 발생할 수 있다.
+
+2. 함수 레벨 스코프
+
+   ```javascript
+   var x = 1
+   if (true) {
+       var x = 100
+   }
+   console.log(x) // 100
+   ```
+
+   > 함수 레벨 스코프는 전역 변수를 남발하는 상황을 유발할 수 있다.
+
+3. 변수 호이스팅
+
+   변수 호이스팅에 의해 선언 이전에 해당 변수를 참조할 수 있다.
+
+   ```javascript
+   console.log(x) // undefined
+   var x = 100
+   console.log(x) // 100
+   ```
+
+   > 프로그램의 흐름 상 맞지 않기에 가독성을 떨어뜨린다.
+
+### 2. let 키워드
+
+#### 2-1. 변수 중복 선언 금지
+
+```javascript
+let x = 10
+console.log(x)	// 10
+x = 100
+console.log(x)	// 100
+
+let x = 1000	// SyntaxError: Identifier "x" has already been declared
+console.log(x)
+```
 
 
 
+#### 2-2. 블록 레벨 스코프
+
+```javascript
+let x = 10
+if (true) {
+    console.log(x)	// 10
+    let x = 100
+    let y = 200
+    console.log(x)	// 100
+}
+console.log(x)		// 10
+console.log(y)		// ReferenceError: y is not defined
+```
+
+let 키워드로 선언한 변수는 모든 코드 블록(`if`, `for`, `while`, `try/catch` 등)을 스코프로 인정하는 **블록 레벨 스코프**를 따른다.
 
 
 
+#### 2-3. 변수 호이스팅
+
+```javascript
+console.log(x)	// ReferenceError: x is not defined
+let x = 100
+```
+
+var 키워드로 선언한 변수는 런타임 이전에 자바스크립트 엔진에 의해 암묵적으로 "선언 단계"와 "초기화 단계"가 진행된다.
+선언 단계에서 실행 컨텍스트의 환경에 변수 식별자를 등록하여 자바스크립트 엔진에 변수가 존재한다는 사실을 인지할 수 있게 된다.
+초기화 단계에서 해당 변수를 `undefined`로 초기화한다.
+
+let 키워드로 선언한 변수는 "선언 단계"와 "초기화 단계"가 분리되어 진행된다.
+런타임 이전에 자바스크립트 엔진에 의해 "선언 단계"가 실행되지만, "초기화 단계"는 변수 선언문에 도달하였을 때 실행된다.
+
+> **!중요!**
+>
+> **let 키워드로 선언한 변수가 호이스팅이 발생하지 않는 것이 아니다.**
+> 변수 선언에 도달하기 전까지 "초기화"가 이루어지지 않을 뿐, "선언"은 런타임 이전에 이루어 진다.
+
+```javascript
+let x = 1
+if (true) {
+    console.log(x)	// ReferenceError: Cannot access "x" before initialization
+    let x = 100
+}
+```
+
+호이스팅이 이루어지지 않았다면, `console.log(x)`는 1을 출력했었어야 했다.
+하지만, 초기화되지 않은 x를 참조하지 못한다는 에러가 발생했다. 이는, `if`문 안의 `let x = 100`에 의해 내부 x는 이미 선언된 상태라는 것이고, 초기화 되기 전에 변수를 참조하려고 하였기 때문에 일시적 사각 지대(Temporal Dead Zone) 상태인 x에 의해 에러가 발생하는 것이다.
+
+---
+
+> 호이스팅
+>
+> 런타임 전, 자바스크립트 엔진에 의해 선언문에 의해 선언된 변수 또는 함수(클래스)가 실행 컨텍스트의 스코프에 등록되는 것
+>
+> 자바스크립트는 ES6에서 도입된 let, const를 포함하여 모든 선언(var, let, const, function, class 등)을 호이스팅한다. 단, let, const, class를 사용한 선언문은 호이스팅이 발생하지 않는 것처럼 동작한다.
+
+---
+
+### 3. const 키워드
+
+#### 3-1. 선언과 초기화
+
+const 키워드로 선언한 변수는 선언과 동시에 초기화해야 한다. 
+
+```javascript
+const foo	// SyntaxError: Mission initializer in const declaration
+```
+
+#### 3-2. 재할당 금지
+
+const 키워드로 선언한 변수는 재할당 할 수 없다.
+
+```javascript
+const foo = 1
+foo = 10	// TypeError: Assignment to constant variable.
+```
+
+#### 3-3. 상수
+
+const 키워드의 특성 상, const는 상수를 표현하는 데 사용하기도 한다.
+
+```javascript
+const TAX_RATE = 0.1
+let preTaxPrice = 100
+
+let afterTaxPrice = preTaxPrice + (preTaxPrice * TAX_RATE)
+```
+
+#### 3-4. 객체
+
+const 키워드를 이용하여 원시값을 선언한 경우에는 변경할 수 없다. 이는 값에 의한 참조를 하고 있기 때문에, 원시값을 변경할 수 없어 일어나는 특성이다.
+
+하지만, const 키워드를 이용하여 객체를 선언한 경우에는 객체 내부의 프로퍼티는 변경할 수 있다.
+
+```javascript
+const person = {
+    name: "김병훈"
+}
+person.name = "비타민"
+console.log(person.name)	// 비타민
+```
 
 
 
+## 16장 프로퍼티 어트리뷰트
+
+자바스크립트 엔진은 프로퍼티를 생성할 때, 프로퍼티의 상태를 나타내는 **프로퍼티 어트리뷰트**를 기본값으로 자동 정의한다.
+
+프로퍼티의 상태:
+
+1. 프로퍼티의 값(value)
+2. 값의 갱신 가능 여부(writable)
+3. 열거 가능 여부(enumerable)
+4. 재정의 가능 여부(configurable)
+
+```javascript
+const person = {
+    name: "김병훈"
+}
+console.log(Object.getOwnPropertyDescriptor(person, "name"))
+// {value: '김병훈', writable: true, enumerable: true, configurable: true}
+```
+
+```javascript
+const person = {
+    name: "김병훈"
+}
+person.age = 30
+console.log(Object.getOwnPropertyDescriptors(person))
+// age: {value: 30, writable: true, enumerable: true, configurable: true}
+// name: {value: '김병훈', writable: true, enumerable: true, configurable: true}
+```
 
 
 
+### 데이터 프로퍼티 & 접근자 프로퍼티
 
+#### 데이터 프로퍼티
 
+키와 값으로 구성된 일반적인 프로퍼티.
 
+#### 접근자 프로퍼티
 
+자체적으로는 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 호출되는 접근자 함수로 구성된 프로퍼티
 
+> ex) getter / setter
+
+```javascript
+const person = {
+    firstName: "병훈",
+    lastName: "김",
+    get fullName() {
+        return `${lastName} ${firstName}`
+    },
+    set fullName(name) {
+        [this.lastName, this.firstname] = name.split(" ")
+    }
+}
+
+console.log(Object.getOwnPropertyDescriptors(person))
+//	firstName: {value: '병훈', writable: true, enumerable: true, configurable: true}
+//	lastName: {value: '김', writable: true, enumerable: true, configurable: true}
+//	fullName: {enumerable: true, configurable: true, get: ƒ, set: ƒ}
+```
+
+> 데이터 프로퍼티: firstName / lastName
+>
+> 접근자 프로퍼티: fullName
 
 
 
