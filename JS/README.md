@@ -792,3 +792,316 @@ console.log(Object.getOwnPropertyDescriptors(person))
 
 
 
+## 17장 생성자 함수에 의한 객체 생성
+
+### 17-1. Object 생성자 함수 ❌
+
+new 연산자와 함께 Object 생성자 함수를 호출하여 객체를 생성할 수 있다.
+
+```javascript
+const person = new Object()
+
+person.name = "김병훈"
+person.sayHello = function() {
+    console.log(`안녕! ${this.name}`)
+}
+console.log(person)	// {name: "김병훈", sayHello: f}
+person.sayHello		// 안녕! 김병훈
+```
+
+#### 생성자 함수
+
+생성자 함수: new 연산자와 함께 호출하여 객체(인스턴스)를 생성하는 함수
+
+### 17-2. 생성자 함수
+
+#### 객체 리터럴 방식의 문제점
+
+> 유사한 여러 객체를 생성할 때, 반복 작업을 해야한다.
+
+```javascript
+const circle1 = {
+    radius: 5,
+    // 반복
+    getDiameter() {
+        return 2 * this.radius
+    }
+}
+const circle2 = {
+    radius: 10,
+    // 반복
+    getDiameter() {
+        return 2 * this.radius
+    }
+}
+```
+
+
+
+#### 생성자 함수의 장점
+
+> 프로퍼티 구조가 동일한 객체 여러 개를 간편하게 생성할 수 있다.
+
+```javascript
+function Circle(radius) {
+    this.radius = radius
+    this.getDiameter = function() {
+        return 2 * this.radius
+    }
+}
+
+const circle1 = new Circle(5)
+const circle2 = new Circle(10)
+```
+
+##### new
+
+new 연산자와 함께 호출해야 생성자 함수로서 동작한다.
+
+new 연산자를 함께 사용하지 않으면 일반 함수로 동작한다.
+
+```javascript
+const circle3 = Circle(3)
+console.log(circle3)	// undefined
+// Circle 함수는 반환값이 없다.
+
+console.log(radius)	// 3
+// Circle 함수가 실행되며, this는 전역 객체를 가리키게 되고
+// 전역 객체에 radius와 getDiameter가 등록된다.
+```
+
+
+
+##### this
+
+this는 객체 자신의 프로퍼티나 메서드를 참조하기 위한 자기 참조 변수이다. this가 가리키는 값, this 바인딩은 함수 호출 방식에 따라 **동적으로 결정**된다.
+
+| 함수 호출 방식       | this가 가리키는 값                      |
+| -------------------- | --------------------------------------- |
+| 일반 함수로서 호출   | 전역 객체 (window / global)             |
+| 메서드로서 호출      | 메서드를 호출한 객체 (마침표 앞의 객체) |
+| 생성자 함수로서 호출 | 생성자 함수가 생성할 인스턴스           |
+
+```javascript
+function foo() {
+    console.log(this)
+}
+const obj = {
+    foo
+}
+
+foo()	// window
+obj.foo()	// obj
+const inst = new foo()	// inst
+```
+
+
+
+#### 생성자 함수의 인스턴스 생성 과정
+
+> 생성자 함수에서 해야하는 것은?
+>
+> 1. 인스턴스 생성
+> 2. 생성된 인스턴스 초기화 (인스턴스의 프로퍼티를 추가하고 그 값을 초기화하는 것)
+
+##### 1. 인스턴스 생성과 this 바인딩
+
+암묵적으로 빈 객체가 생성된다. (인스턴스)
+
+인스턴스(빈 객체)가 this에 바인딩된다.
+
+```javascript
+function Circle(radius) {
+    // 1. 암묵적으로 인스턴스가 생성되고, this에 바인딩된다.
+    console.log(this)	// Circle {}
+    
+    // ...
+}
+```
+
+##### 2. 인스턴스 초기화
+
+생성자 함수에 적힌 코드가 한 줄씩 실행되며, this에 바인딩되어 있는 인스턴스에 프로퍼티와 메서드를 추가하고, 전달받은 초기값을 할당한다.
+
+```javascript
+function Circle(radius) {
+    // 1. 암묵적으로 인스턴스가 생성되고, this에 바인딩된다.
+    console.log(this)	// Circle {}
+    
+    // 2. 인스턴스 초기화
+    this.radius = radius
+    this.getDiameter = function() {
+        return 2 * this.radius
+    }
+}
+```
+
+##### 3. 인스턴스 반환
+
+생성자 함수 내의 처리가 끝 => 완성된 인스턴스가 바인딩된 this가 암묵적으로 반환된다. (변수에 할당)
+
+```javascript
+function Circle(radius) {
+    // 1. 암묵적으로 인스턴스가 생성되고, this에 바인딩된다.
+    console.log(this)	// Circle {}
+    
+    // 2. 인스턴스 초기화
+    this.radius = radius
+    this.getDiameter = function() {
+        return 2 * this.radius
+    }
+}
+
+// 3. 인스턴스 생성(반환)
+const circle1 = new Circle(10)
+console.log(circle1)	// Circle {radius: 10, getDiameter: f}
+```
+
+만약 생성자 함수에서 다른 객체를 명시적으로 (return문을 통해) 반환한다면, 암묵적으로 반환할 예정이었던 this는 무시한다.
+
+```javascript
+function Circle(radius) {
+    // 1. 암묵적으로 인스턴스가 생성되고, this에 바인딩된다.
+    console.log(this)	// Circle {}
+    
+    // 2. 인스턴스 초기화
+    this.radius = radius
+    this.getDiameter = function() {
+        return 2 * this.radius
+    }
+    
+    return {}
+}
+const circle2 = new Circle(100)
+console.log(circle2)	// {}
+```
+
+생성자 함수에서 객체가 아닌 원시값을 반환한다면, 원시값을 무시하고 this를 반환한다.
+
+```javascript
+function Circle(radius) {
+    // 1. 암묵적으로 인스턴스가 생성되고, this에 바인딩된다.
+    console.log(this)	// Circle {}
+    
+    // 2. 인스턴스 초기화
+    this.radius = radius
+    this.getDiameter = function() {
+        return 2 * this.radius
+    }
+    
+    return 10000000000000000000000000000000000000000000000000
+}
+const circle3 = new Circle(100)
+console.log(circle3)	// Circle {radius: 100, getDiameter: f}
+```
+
+#### 함수 (callable / constructor & non-constructor)
+
+함수는 객체이다. 하지만 일반 객체와는 다르다.
+
+> 일반 객체는 호출할 수 없지만, 함수는 호출할 수 있다.
+
+모든 함수는 호출할 수 있지만(callable), 모든 함수를 생성자 함수로 호출할 수 있는 것은 아니다.
+
+---
+
+자바스크립트 엔진은 함수가 어떻게 정의되어있는지를 평가하여 함수가 생성자 함수로 호출할 수 있는지 아닌지를 구분한다.
+
+- constructor: 함수 선언문, 함수 표현식, 클래스
+- non-constructor: 메서드, 화살표 함수
+
+```javascript
+// 함수 선언문
+function constructor1() {}
+// 함수 표현식
+const constructor2 = function() {}
+const x = {
+    constructor3: function() {}
+}
+
+new constructor1()
+new constructor2()
+new x.constructor3()
+```
+
+```javascript
+// 화살표 함수
+const nonCon1 = () => {}
+// 메서드(ES6 축약형)
+const x = {
+    nonCon2() {}
+}
+new nonCon1()	// TypeError: nonCon1 is not a constructor
+new x.nonCon2()	// TypeError: x.nonCon2 is not a constructor
+```
+
+
+
+#### new 연산자
+
+new 연산자 없이 함수를 호출하면 내부 메서드 `[[Call]]`이 호출된다.
+
+new 연산자와 함께 함수를 호출하기 위해서는 해당 함수가 constructor이어야 하며, 내부 메서드 `[[Construct]]`가 호출된다.
+
+##### new.target
+
+생성자 함수가 new 연산자 없이 호출되는 것을 방지하기 위해 ES6에서 도입되었다.
+
+함수 내부에서 `new.target`을 사용하면, new 연산자와 함께 호출되었는지 아닌지 확인할 수 있다.
+
+> new 연산자와 함께 생성자 함수로서 호출되었다면: `new.target === 함수 자신`
+>
+> 일반 함수로서 호출되었다면: `new.target === undefined`
+
+```javascript
+function Circle(radius) {
+    if (!new.target) {
+        // new 연산자와 함께 호출되지 않았다면
+        // 생성자 함수를 재귀 호출하여 생성된 인스턴스를 반환한다.
+        return new Circle(radius)
+    }
+    // ...
+}
+```
+
+##### 스코프 세이프 생성자 패턴
+
+```javascript
+function Circle(radius) {
+    if (!(this instanceof Circle)) {
+        return new Circle(radius)
+    }
+    // ...
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
