@@ -1077,7 +1077,184 @@ function Circle(radius) {
 
 
 
+## 18장 함수와 일급 객체
 
+### 18-1. 일급 객체
+
+객체 중에 일급 객체가 되려면, 어떤 조건을 가지고 있어야 할까?
+
+1. 무명의 리터럴로 생성할 수 있다. 즉, 런타임에 생성이 가능하다.
+2. 변수나 자료구조(배열, 객체 등)에 저장할 수 있다.
+3. 함수의 매개변수에 전달할 수 있다.
+4. 함수의 반환값으로 사용할 수 있다.
+
+```javascript
+// 1. 익명 함수로 생성
+// 2. 함수는 변수에 저장할 수 있다.
+// 런다임에 함수 리터럴이 평가되어 함수 객체가 생성되고, 변수에 할당된다.
+const increase = function(num) {
+    return ++num
+}
+const decrease = function(num) {
+    return --num
+}
+
+// 2. 함수는 객체나 배열에 저장할 수 있다.
+const arr = [increase, decrease]
+const predicates = {
+    increase,
+    decrease,
+}
+
+// 3. 함수의 매개변수에 전달할 수 있다.
+// 4. 함수의 반환값으로 사용할 수 있다.
+function makeCounter(predicate) {
+    let num = 0
+    return function() {
+        num = predicate(num)
+        return num
+    }
+}
+
+const increaser = makeCounter(predicates.increase)
+console.log(increaser())
+
+const decreaser = makeCounter(predicates.decrease)
+console.log(decreaser())
+```
+
+### 18-2. 함수 객체의 프로퍼티
+
+함수는 객체이기에 프로퍼티를 가질 수 있다.
+
+```javascript
+function square(num) {
+    return num * num
+}
+console.dir(square)
+// ƒ square(number)
+// arguments: null
+// caller: null
+// length: 1
+// name: "square"
+// prototype: {constructor: ƒ}
+// [[FunctionLocation]]: VM5172:1
+// [[Prototype]]: ƒ ()
+// [[Scopes]]: Scopes[1]
+
+console.log(Object.getOwnPropertyDescriptors(square))
+// {length: {…}, name: {…}, arguments: {…}, caller: {…}, prototype: {…}}
+// arguments: {value: null, writable: false, enumerable: false, configurable: false}
+// caller: {value: null, writable: false, enumerable: false, configurable: false}
+// length: {value: 1, writable: false, enumerable: false, configurable: true}
+// name: {value: 'square', writable: false, enumerable: false, configurable: true}
+// prototype: {value: {…}, writable: true, enumerable: false, configurable: false}
+// [[Prototype]]: Object
+```
+
+#### 1. arguments
+
+arguments 객체는 Key (인수의 순서) - Value (인수의 값)로 구성되어 있다. 배열 형태로 인자 정보를 담고 있지만, 실제 배열이 아닌 유사 배열 객체이다.
+
+> 유사 배열 객체: length 프로퍼티를 가진 객체로 for문으로 순회할 수 있는 객체를 말한다.
+
+arguments 객체는 매개변수 개수를 확정할 수 없는 **가변 인자 함수**를 구현할 때 유용하다.
+
+```javascript
+function sum() {
+    let res = 0
+    for (let i = 0; i < arguments.length; i++) {
+        res += arguments[i]
+    }
+    return res
+}
+
+console.log(sum())			// 0
+console.log(sum(1, 2))		// 3
+console.log(sum(1, 2, 3))	// 6
+```
+
+```javascript
+function sum() {
+    const array = Array.prototype.slice.call(arguments)
+    return array.reduce(function (pre, cur) {
+        return pre + cur
+    }, 0)
+}
+```
+
+ES6에서는 Rest 파라미터가 도입되었다.
+
+```javascript
+function sum(...args) {
+    return args.reduce((pre, cur) => pre + cur, 0)
+}
+```
+
+#### 2. caller 프로퍼티
+
+#### 3. length 프로퍼티
+
+함수를 정의할 때 선언한 매개변수의 개수
+
+> arguments 프로퍼티 객체의 length는 인자(argument)의 개수를 가리키고,
+>
+> 함수의 length 프로퍼티는 매개변수(parameter)의 개수를 가리킨다.
+
+```javascript
+function foo() {}
+console.log(foo.length)	// 0
+function bar(x) {
+    return x
+}
+console.log(bar.length)	// 1
+```
+
+#### 4. name 프로퍼티
+
+함수 이름을 나타낸다.
+
+```javascript
+// 함수 표현식
+const namedFunc = function foo() {}
+const anonymousFunc = function() {}
+console.log(namedFunc.name)		// foo
+console.log(anonymousFunc.name)	// ES5: ""	// ES6: anonymousFunc
+
+// 함수 선언문
+function bar() {}
+console.log(bar.name)			// bar
+```
+
+
+
+## 19장 프로토타입
+
+자바스크립트는 프로토타입 기반 객체지향 프로그래밍을 지원하는 프로그래밍 언어이다.
+
+원시 타입(Number, String, Boolean, Symbol, Null, Undefined)을 제외한 모든 것은 객체이다.
+
+### 19-1. 객체지향 프로그래밍
+
+프로그램을 명령어 또는 함수의 목록으로 보는 전통적인 명령형 프로그래밍의 절차지향적 관점에서 벗어나
+
+여러 개의 독립적 단위, 즉 객체의 집합으로 프로그램을 표현하려는 프로그래밍 패러다임을 말한다.
+
+다양한 속성 중에서 프로그램에 필요한 속성만 간추려 내어 표현하는 것을 추상화라 한다.
+
+```javascript
+const person = {
+    name: "Lee",
+    address: "Seoul",
+    hello() {
+        console.log("안녕하세요")
+    }
+}
+```
+
+> 이처럼 객체지향 프로그래밍은 객체의 상태를 나타내는 데이터와 상태 데이터를 조작할 수 있는 동작을 하나의 논리적인 단위로 묶어 생각한다.
+>
+> 객체: 상태 데이터와 동작을 하나의 논리적 단위로 묶은 복합적인 자료구조
 
 
 
