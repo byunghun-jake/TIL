@@ -948,6 +948,142 @@ function solution(priorities, location) {
 
 
 
+```js
+class Node {
+  constructor(value) {
+    this.value = value
+    this.next = null
+  }
+}
+
+class Queue {
+  constructor() {
+    this.head = null
+    this.tail = null
+    this.size = 0
+  }
+
+  enqueue(value) {
+    const newNode = new Node(value)
+    if (this.head === null) {
+      this.head = this.tail = newNode
+    } else {
+      this.tail.next = newNode
+      this.tail = newNode
+    }
+    this.size += 1
+  }
+
+  dequeue() {
+    const value = this.head.value
+    this.head = this.head.next
+    this.size -= 1
+    return value
+  }
+}
+
+function solution(priorities, location) {
+  const queue = new Queue()
+  const prioritiesQueue = new Queue()
+  priorities.forEach((priority, i) => {
+    queue.enqueue([priority, i === location])
+  })
+  priorities
+    .sort((a, b) => b - a)
+    .forEach((priority) => {
+      prioritiesQueue.enqueue(priority)
+    })
+
+  let count = 1
+  while (queue.size) {
+    const [priority, isMine] = queue.dequeue()
+    if (priority === prioritiesQueue.head.value) {
+      prioritiesQueue.dequeue()
+      if (isMine) {
+        return count
+      }
+      count += 1
+    } else {
+      queue.enqueue([priority, isMine])
+    }
+  }
+}
+```
+
+
+
+
+
+#### 기능개발
+
+```js
+class Node {
+  constructor(value) {
+    this.value = value
+    this.next = null
+  }
+}
+
+class Queue {
+  constructor() {
+    this.head = null
+    this.tail = null
+    this.size = 0
+  }
+
+  enqueue(value) {
+    const newNode = new Node(value)
+    if (this.head === null) {
+      this.head = this.tail = newNode
+    } else {
+      this.tail.next = newNode
+      this.tail = newNode
+    }
+    this.size += 1
+  }
+
+  dequeue() {
+    const value = this.head.value
+    this.head = this.head.next
+    this.size -= 1
+    return value
+  }
+}
+
+function solution(progresses, speeds) {
+  const answer = []
+  const queue = new Queue()
+  progresses.forEach((progress, i) => {
+    queue.enqueue([progress, speeds[i]])
+  })
+
+  while (queue.size) {
+    let cNode = queue.head
+    while (cNode) {
+      const [p, s] = cNode.value
+      cNode.value = [p + s, s]
+      cNode = cNode.next
+    }
+    cNode = queue.head
+    let count = 0
+    while (cNode && cNode.value[0] >= 100) {
+      queue.dequeue()
+      count += 1
+      cNode = queue.head
+    }
+    if (count > 0) {
+      answer.push(count)
+    }
+  }
+  console.log(answer)
+  return answer
+}
+```
+
+
+
+
+
 # 7. 해시 테이블
 
 
@@ -1239,4 +1375,254 @@ function solution(participant, completion) {
     return Object.keys(p_obj)[0];
 }
 ```
+
+
+
+# 8. 그래프
+
+정점과 정점 사이를 연결하는 간선으로 이루어진 비선형 자료구조
+
+정점 집합(Node)와 간선 집합(Edge)으로 표현할 수 있다.
+
+> 지금까지는 선형 자료구조였지
+> 배열, 스택, 큐, 연결 리스트
+
+
+
+## 특징
+
+- 정점은 여러 개의 간선을 가질 수 있다.
+
+  > 선형 자료구조는 하나의 노드의 앞뒤로 노드가 하나씩 연결되지만, 비선형 자료구조인 그래프는 하나의 노드에 여러 노드가 연결될 수 있다.
+
+- 크게 방향 그래프와 무방향 그래프로 나눌 수 있다.
+
+- 간선은 가중치를 가질 수 있다.
+
+  > A - (2) -> B -(3) -> C
+
+- 사이클이 발생할 수 있다.
+
+  > A -> B -> C -> A
+
+
+
+## 간선의 방향에 따른 분류
+
+### 무방향 그래프
+
+간선에 방향이 존재하지 않는다. (양방향으로 이동이 가능하다.)
+
+### 방향 그래프
+
+간선에 방향성이 존재한다.
+
+
+
+## 노드 연결 상태에 따른 분류
+
+### 연결 그래프
+
+모든 노드가 연결되어 있는 그래프
+
+한 노드에서 모든 노드로 이동할 수 있다.
+
+### 비연결 그래프
+
+특정한 노드는 연결되어 있지 않은 그래프
+
+### 완전 그래프
+
+모든 정점끼리 서로 연결되어 있는 그래프
+
+
+
+## 구현 방법
+
+인접 행렬, 인접 리스트
+
+![image-20211218152607779](README.assets/image-20211218152607779.png)
+
+### 인접 행렬
+
+2차원 행렬이기에 많은 메모리를 차지한다.
+
+A노드와 B노드가 연결되어 있는지 확인하는 탐색은 빠르다.
+
+```js
+const graph = Array.from(Array(5), () => Array(5).fill(false))	// 5X5 2차원 배열 생성
+
+graph[0][1] = true
+graph[0][3] = true
+graph[1][2] = true
+graph[2][0] = true
+graph[2][4] = true
+graph[3][2] = true
+graph[4][0] = true
+
+console.log(graph)
+```
+
+```js
+// 간선에 가중치가 있는 경우
+const graph = Array.from(Array(5), () => Array(5).fill(null))
+
+graph[0][1] = 2
+graph[0][3] = 1
+graph[1][2] = 1
+graph[2][0] = 3
+graph[2][4] = 2
+graph[3][2] = 2
+graph[4][0] = 1
+```
+
+
+
+### 인접 리스트
+
+연결되어 있는 정보만 저장하기에 메모리를 적게 차지한다.
+
+노드간 연결 정보를 확인하는 과정이 다소 느리다.
+
+```js
+const graph = Array.from(Array(5), () => [])
+// [[], [], [], [], []]
+
+graph[0].push(1)
+graph[0].push(3)
+// ...
+```
+
+
+
+# 9. 트리
+
+방향 그래프의 일종으로 정점을 가리키는 간선이 하나 밖에 없는 구조를 가지고 있다.
+
+![image-20211218153651381](README.assets/image-20211218153651381.png)
+
+디렉토리 구조, 조직도 등에서 활용
+
+## 특징
+
+- 루트 정점을 제외한 모든 정점은 반드시 하나의 부모 정점을 가진다.
+- 정점이 N개인 트리는 N - 1개의 간선을 가진다. (루트 노드)
+- 루트에서 특정 정점으로 가는 경로는 유일하다.
+
+
+
+## 이진트리
+
+이진 트리는 각 정점이 최대 2개의 자식 정점(0 ~ 2)을 갖는 트리를 의미한다.
+
+![image-20211218153927284](README.assets/image-20211218153927284.png)
+
+
+
+### 특징
+
+- 정점이 N개인 이진 트리가 가질 수 있는 최대 높이는 N이다. (편향 트리)
+- 정점이 N개인 포화 또는 완전 이진 트리의 높이는 logN이다. (1, 2, 4, 8, ...)
+- 높이가 h인 포화 이진 트리는 2^h - 1개의 정점을 가진다. (1 = 2 - 1 / 3 = 4 - 1 / 7 = 8 - 1)
+- 일반적인 이진 트리를 사용하는 경우는 많지 않고, 다음 응용 구조에 사용된다.
+  - 이진 탐색 트리
+  - 힙
+  - AVL 트리
+  - 레드 블랙 트리
+
+### 구현
+
+트리는 그래프의 일종이기에 그래프 구현 방식과 동일하게 (인접 행렬, 인접 리스트) 구현 가능
+
+#### 이진 트리(Array)
+
+<img src="README.assets/image-20211218154945009.png" alt="image-20211218154945009" style="zoom:33%;" />
+
+```js
+// 0번 인덱스는 편의를 위해 비워둔다.
+// left = index * 2
+// right = index * 2 + 1
+// Parent = floor(index / 2)
+const tree = [
+    undefined,
+    9,
+    3, 8,
+    2, 5, undefined, 7,
+    undefined, undefined, undefined, 4,
+]
+```
+
+
+
+#### 이진 트리 (LinkedList)
+
+```js
+const Node {
+    constructor(value) {
+        this.value = value
+        this.left = null
+        this.right = null
+    }
+}
+
+class Queue {
+    constructor() {
+        this.queue = []
+        this.front = 0
+        this.rear = 0
+        this.size = 0
+    }
+    
+    enqueue(node) {
+		this.queue[this.rear++] = node
+        this.size += 1
+    }
+    
+    dequeue() {
+        const node = this.queue[this.front]
+        delete this.queue[this.front]
+        this.first += 1
+        this.size -= 1
+        return node
+    }
+}
+
+class True {
+    constructor(node) {
+        this.root = node
+    }
+    
+    display() {
+        const queue = new Queue()
+        queue.enqueue(this.root)
+        while (queue.size) {
+            const cNode = queue.dequeue()
+            if (cNode.left) queue.enqueue(cNode.left)
+            if (cNode.right) queue.enqueue(cNode.right)
+        }
+    }
+}
+
+const tree = new Tree(new Node(9))
+tree.root.left = new Node(3)
+tree.root.right = new Node(8)
+tree.root.left.left = new Node(2)
+tree.root.left.right = new Node(5)
+// ...
+// 이게 맞나?
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
