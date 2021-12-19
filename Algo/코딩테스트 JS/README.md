@@ -1624,5 +1624,6 @@ tree.root.left.right = new Node(5)
 
 
 
+![image-20211219152749669](README.assets/image-20211219152749669.png)
 
-
+![image-20211219152755383](README.assets/image-20211219152755383.png)
