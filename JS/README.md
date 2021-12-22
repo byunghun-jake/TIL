@@ -1258,27 +1258,413 @@ const person = {
 
 
 
+## 25장 클래스
+
+자바스크립트에서 클래스는 기존 프로토타입 기반 패턴을 클래스 기반 패턴"처럼" 사용할 수 있도록 하는 문법적 설탕 (Syntactic sugar)이라고 볼 수 있다.
+
+클래스와 생성자 함수의 차이
+
+- 클래스를 new 연산자 없이 호출하면 에러가 발생한다.
+
+  > 생성자 함수는 new 없이 호출하면 일반 함수로서 호출된다.
+
+- 클래스는 상속을 지원하는 `extends`, `super` 키워드를 제공한다.
+
+- 클래스는 호이스팅이 발생하지 "않는 것 처럼" 동작한다.
+
+  > 함수 선언문 `function FunctionName() {}` 으로 정의된 생성자 함수는 함수 호이스팅이, 함수 표현식 `var FunctionVal = function () {}`으로 정의한 생성자 함수는 변수 호이스팅이 발생한다.
+
+- 클래스 내 모든 코드에는 암묵적으로 `strict mode`가 지정되어있다.
+
+- 클래스의 constructor, 프로토타입 메서드, 정적 메서드는 모두 프로퍼티 어트리뷰트 `[[Enumerable]]`의 값이 false다. 열거 불가
+
+이러한 차이들로 클래스를 프로토타입 기반 객체 생성 패턴의 단순한 문법적 설탕이라고 보기보다는 새로운 `객체 생성 메커니즘`으로 보는 것이 더 합당하다.
+
+### 클래스 정의
+
+```js
+// 클래스 선언문
+class Person {}
+
+// 익명 클래스 표현식
+const Person = class {}
+
+// 기명 클래스 표현식
+const Person = class ClassName {}
+```
+
+클래스는 함수다. 자바스크립트에서 함수는 일급 객체이다.
+
+=> 클래스는 일급 객체이다.
 
 
 
+일급 객체로서 클래스의 특징
+
+- 무명의 리터럴로 생성 가능 === 런타임에 생성 가능
+- 변수나 자료구조(객체, 배열 등)에 할당 가능
+- 함수의 매개변수에 전달 가능
+- 함수의 반환값으로 사용 가능
 
 
 
+### 클래스 호이스팅
+
+클래스는 함수다. 함수 선언문으로 정의한 함수는 호이스팅이 이루어진다.
+
+클래스 선언문으로 정의한 클래스도 마찬가지로 소스코드 평가 과정(런타임 이전)에 평가되어 객체를 생성한다. 이때 클래스가 평가되어 생성된 함수 객체는 constructor다.
+
+클래스는 클래스 정의 이전에 참조할 수 없다. (호이스팅이 일어나는 것과는 별개)
+
+```js
+console.log(Person)
+// ReferenceError: Cannot access "Person" before initialization
+
+class Person {}
+```
+
+> 호이스팅이 일어나지 않는 것 처럼 보일 수 있다.
 
 
 
+```js
+const Person = "내가 출력되면, 호이스팅이 일어나지 않는 것이겠지"
+
+{
+    console.log(Person)
+    // ReferenceError: Cannot access "Person" before initialization
+    
+    class Person {}
+}
+```
+
+> `{}` 내의 코드에 대한 평가가 이루어 질 때, `class Person {}`에 대한 호이스팅(등록)이 이루어지지 않았다면 외부의 `Person`을 출력해야 한다.
+> 하지만, 결과는 참조 에러.
+> 참조를 못하는 것일 뿐 호이스팅이 일어난다는 것을 확인할 수 있다.
 
 
 
+### 인스턴스 생성
+
+클래스는 생성자 함수이다.
+
+new 연산자와 함께 호출되어 인스턴스를 생성한다.
 
 
 
+```js
+class Person = {}
+
+const me = new Person()
+const you = Person()	// TypeError: Class constructor Person cannot be invoked without "new"
+```
 
 
 
+### 메서드
+
+클래스 몸체에는 0개 이상의 메서드"만" 정의할 수 있다.
+
+메서드 종류: constructor, 프로토타입 메서드, 정적 메서드
+
+```js
+class Person {
+    // constructor (생성자)
+    // 프로퍼티 생성 및 초기화
+    constructor(name) {
+        this.name = name
+    }
+    
+    // 프로토타입 메서드
+    sayHi() {
+        console.log(`안녕, 내 이름은 ${this.name}이야.`)
+    }
+    
+    static sayHello() {
+        console.log(`Hi!`)
+    }
+}
+
+const me = new Person("김병훈")
+
+console.log(me.name)	// 김병훈
+me.sayHi()				// 안녕, 내 이름은 김병훈이야.
+Person.sayHello()		// Hi!
+```
 
 
 
+#### 생성자 메서드 constructor
+
+constructor는 인스턴스를 생성하고, 초기화하기 위한 특수 메서드이다.
+
+constructor 내부에서 this에 추가한 프로퍼티는 해당 클래스가 생성한 인스턴스의 프로퍼티가 된다.
+
+```js
+class Person {
+    constructor(name) {
+        this.name = name
+    }
+}
+
+const me = new Person("김병훈")
+console.log(me)	// {name: "김병훈"}
+
+// 생성자 함수 내부에서 this에 추가하는 방식과 대응된다.
+function Person (name) {
+    this.name = name
+}
+```
 
 
 
+class의 constructor와 생성자 함수의 차이점
+
+- constructor는 클래스 내에 최대 한 개만 존재할 수 있다.
+  생략이 가능하지만, 암묵적으로 빈 constructor `constructor() {}`가 정의된다.
+- 인스턴스 프로퍼티의 초기값을 전달할 때, 그것을 받는 부분은 constructor이다.
+
+
+
+주의할 점
+
+> constructor 함수 내에 반환문은 갖지 않아야 한다.
+> constructor는 암묵적으로 this를 반환하는데, 반환문이 명시되어 있으면 this가 아닌 반환문에 해당하는 내용을 반환하게 된다.
+> 이는 클래스의 동작을 깨는 방식이기에 해서는 안된다.
+
+
+
+#### 프로토타입 메서드
+
+```js
+// 생성자 함수 내에서 프로토타입 메서드를 정의하는 방법
+function Person(name) {
+    this.name = name
+    
+    Person.prototype.sayHi = function() {
+        console.log(`Hi! ${this.name}`)
+    }
+}
+
+// 클래스에서 프로토타입 메서드를 정의하는 방법
+class Person {
+    constructor(name) {
+        this.name = name
+    }
+    
+    sayHi() {
+        console.log(`Hi! ${this.name}`)
+    }
+}
+```
+
+> sayHi는 Person 클래스의 메서드라고 생각할 수 있지만,
+> 실제로는 Person의 prototype에 있는 메서드이다.
+
+
+
+#### 정적 메서드
+
+인스턴스를 생성하지 않아도 호출할 수 있는 메서드
+
+```js
+// 생성자 함수에 정적 메서드를 추가하기
+function Person(name) {...}
+
+Person.sayHi = function() {}
+
+// 정적 메서드 호출
+Person.sayHi()
+```
+
+```js
+// 클래스에 정적 메서드 추가하기
+class Person {
+    constructor() {
+        // ...
+    }
+    
+    static sayHi() {
+        // ...
+    }
+}
+
+Person.sayHi()
+```
+
+
+
+정적 메서드는 인스턴스로 호출할 수 없다.
+
+인스턴스의 프로토타입 체인에 클래스가 존재하지 않기 때문
+
+(인스턴스) => (클래스의 프로토타입)
+
+```js
+const me = new Person("김병훈")
+me.sayHi()	// TypeError: me.sayHi is not a function
+```
+
+
+
+#### 프로토타입 메서드와 정적 메서드의 차이
+
+- 프로토타입 메서드는 클래스의 프로토타입에 바인딩 되어 있다.
+  정적 메서드는 클래스에 바인딩 되어 있다.
+- 프로토타입 메서드는 인스턴스에서 호출이 가능하다.
+  정적 메서드는 인스턴스에서 호출이 불가능하다.
+- 프로토타입 메서드는 인스턴스의 프로퍼티를 참조할 수 있다.
+  정적 메서드는 인스턴스의 프로퍼티를 참조할 수 없다.
+
+> 이 차이들은 결국, 메서드가 어느 객체에 바인딩 되어 있느냐에 따른 것
+
+
+
+### 인스턴스 생성 과정
+
+1. 인스턴스 생성과 this 바인딩
+
+   new 연산자와 함께 클래스를 호출 => 암묵적으로 빈 객체(인스턴스) 생성 => 클래스의 프로토타입 객체를 인스턴스의 프로토타입으로 설정 => 인스턴스는 this에 바인딩
+
+2. 인스턴스 초기화
+
+   constructor 내부 코드 실행 (this에 바인딩 되어 있는 인스턴스 초기화)
+
+   인스턴스에 프로퍼티 추가 => constructor 인수가 받은 값으로 프로퍼티 값을 초기화
+
+3. 인스턴스 반환
+
+   constructor 코드 종료 => 인스턴스에 바인딩된 this가 반환된다.
+
+
+
+### 상속에 의한 클래스 확장
+
+```js
+class Animal {
+    constructor(age, weight) {
+        this.age = age
+        this.weight = weight
+    }
+    eat() {return "eat"}
+    move() {return "move"}
+}
+
+class Bird extends Animal {
+    fly() {return "fly"}
+}
+
+class Lion extends Animal {
+    attack() {return "attack"}
+}
+```
+
+> 코드 재사용성을 높이고, 중복된 코드 작성을 방지할 수 있다.
+
+
+
+#### super 키워드
+
+##### super 호출
+
+super를 호출하면 수퍼클래스의 constructor를 호출한다.
+
+- 서브클래스에서는 constructor를 생략하지 않는 한, 반드시 super를 호출해야 한다. (Error 발생)
+- 서브클래스의 constructor에서 super를 호출하기 전에는 this를 참조할 수 없다.
+- super는 반드시 서브클래스의 constructor에서 호출해야 한다. 프로토타입 메서드나 정적 메서드에서 호출하면 에러 발생
+
+##### super 참조
+
+메서드 내에서 super를 참조하면, 수퍼클래스의 메서드를 호출할 수 있다.
+
+- 서브클래스의 프로토타입 메서드 내에서 super.sayHi는 수퍼클래스의 프로토타입 메서드 sayHi를 가리킨다.
+
+  ```js
+  class Base {
+      sayHi() {
+          console.log("Base의 프로토타입 메서드")
+      }
+  }
+  
+  class SubClass extends Base {
+      sayHi() {
+          super.sayHi()
+      }
+  }
+  
+  const sub = new SubClass()
+  sub.sayHi()	// Base의 프로토타입 메서드
+  ```
+
+  
+
+#### 상속 클래스의 인스턴스 생성 과정
+
+```js
+class Rectangle {
+    constructor (width, height) {
+        this.width = width
+        this.height = height
+    }
+    
+    getArea() {
+        return this.width * this.height
+    }
+    
+    toString() {
+        return `width: ${this.width}, height: ${this.height}`
+    }
+}
+
+class ColorRectangle extends Rectangle {
+    constructor(width, height, color) {
+        super(width, height)
+        this.color = color
+    }
+    
+    // 프로토타입 메서드 오버라이딩 (덮어쓰기)
+    toString() {
+        return super.toString() + `, color: ${this.color}`
+    }
+}
+
+const r1 = new ColorRectangle(2, 4, "red")
+console.log(r1.gerArea())	// 8
+console.log(r1.toString())	// width: 2, height: 4, color: red
+```
+
+1. 서브클래스의 super 호출
+
+   서브클래스는 직접 인스턴스를 생성하지 않고, 수퍼클래스에게 인스턴스 생성을 위임한다.
+
+   > 서브클래스의 constructor에서 반드시 super를 호출해야 하는 이유
+
+   super를 호출하면, 수퍼클래스의 constructor를 호출하는 것이다. 수퍼클래스가 평가되어 생성된 함수 객체의 코드가 실행된다.
+
+2. 수퍼클래스 인스턴스 생성과 this 바인딩
+
+   수퍼클래스 코드가 실행되면서, 인스턴스가 생성된다.
+
+   new 연산자와 호출된 클래스는 서브클래스이기에 인스턴스는 서브클래스가 생성하는 것으로 처리된다.
+
+3. 수퍼클래스 인스턴스 초기화
+
+   수퍼클래스의 constructor가 실행되면서, this에 바인딩 되어 있는 인스턴스를 초기화한다.
+
+4. 서브클래스 constructor 복귀와 this 바인딩
+
+   서브클래스에서 호출한 super가 종료되고, 제어 흐름이 서브클래스 constructor로 복귀한다.
+
+   수퍼클래스가 반환한 인스턴스가 서브클래스의 this에 바인딩된다.
+
+   서브클래스는 인스턴스를 직접 생성하지 않고, 수퍼클래스가 반환한 인스턴스를 이어받아 작업을 진행한다.
+
+   > 서브클래스의 constructor에서 this 초기화 코드 이전에 super를 호출해야 하는 이유!
+
+5. 서브클래스 인스턴스 초기화
+
+   서브클래스에 전달된 인자로 인스턴스의 프로퍼티를 초기화한다.
+
+6. 인스턴스 반환
+
+   서브클래스의 constructor가 종료되며, 인스턴스가 바인딩된 this가 반환된다.
