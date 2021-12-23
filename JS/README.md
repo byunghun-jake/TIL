@@ -1668,3 +1668,183 @@ console.log(r1.toString())	// width: 2, height: 4, color: red
 6. 인스턴스 반환
 
    서브클래스의 constructor가 종료되며, 인스턴스가 바인딩된 this가 반환된다.
+
+
+
+## 26장 ES6 함수의 추가 기능
+
+### 함수의 구분
+
+ES6 이전의 함수는 new 연산자와 함께 호출하면 생성자 함수이고, 그렇지 않으면 일반 함수가 된다.
+=> constructor 이자, callable 이다.
+
+이는 객체 내부의 함수, 메서드에도 동일하게 적용되는데, 이는 성능 면에서 문제가 된다. (함수의 인자로 전달하는 콜백함수도 마찬가지)
+=> 객체에 바인딩 된 함수가 constructor라는 것은 객체에 바인딩된 함수가 prototype 프로퍼티를 가지며, 프로토타입 객체도 생성한다는 것을 의미하기 때문
+
+뭐든 다 할 수 있는 함수를 그대로 사용하는 것 보다는 용도에 맞도록 제한되는 방식으로 구분하자!
+
+| ES6 함수 구분 | constructor | prototype | super | arguments |
+| ------------- | ----------- | --------- | ----- | --------- |
+| 일반 함수     | O           | O         | X     | O         |
+| 메서드        | X           | X         | O     | O         |
+| 화살표 함수   | X           | X         | X     | X         |
+
+### 메서드
+
+ES6 사양에서 메서드란, 메서드 축약 표현으로 정의된 함수만을 의미한다.
+
+```js
+const obj = {
+    name: "김병훈",
+    callMe() {
+        console.log("나는 non-constructor이다.")
+    },
+    callMe2: function() {
+        console.log("나는 constructor이다.")
+    }
+}
+
+new obj.callMe()	// TypeError: obj.callMe is not a contrutctor
+```
+
+
+
+### 화살표 함수
+
+```js
+const sum = (a, b) => {
+    return a + b
+}
+
+// 즉시 실행 함수
+const person = (name => ({
+    sayHi() { return `Hi! My name is ${name}` }
+}))("Kim")
+```
+
+
+
+#### 화살표 함수와 일반 함수의 차이
+
+1. 인스턴스를 생성할 수 없는 `non-constructor`이다.
+
+   - new 연산자로 호출할 수 없다.
+   - prototype 프로퍼티가 없다.
+
+2. 중복된 매개변수 이름을 선언할 수 없다.
+
+   ```js
+   function sum (a, a) { return a + a }
+   console.log(sum(1, 2))	// 4
+   
+   const sum = (a, a) => a + a	// SyntaxError: Duplicate parameter name not allowed in this context
+   ```
+
+   > 일반 함수도 strict mode에서는 SyntaxError가 발생한다.
+
+3. 함수 자체의 this, arguments, super, new.target 바인딩을 갖지 않는다.
+
+   화살표 함수 내에서 this, arguments, super, new.target을 참조하면, 스코프 체인을 통해 상위 스코프의 this, arguments, super, new.target을 참조한다.
+
+
+
+#### this
+
+화살표 함수가 일반 함수와 가장 큰 차이를 보이는 부분
+
+this 바인딩은 함수의 호출 방식, 즉 함수가 어떻게 호출 되었느냐에 따라 동적으로 결정된다. (렉시컬 스코프)
+
+이때, 주의할 것은 콜백 함수인 경우.
+고차함수의 인수로 전달되어 고차 함수 내부에서 호출되는 콜백 함수도 중첩 함수라 할 수 있다.
+
+```js
+class Perfixer {
+    constructor(prefix) {
+        this.prefix = prefix
+    }
+    
+    add(arr) {
+        return arr.map(function(item) {
+            return this.prefix + item
+            // TypeError: Cannot read property 'prefix' of undefined
+        })
+    }
+}
+
+const prefixer = new Prefixer("-webkit-")
+console.log(prefixer.add(["transition", "user-select"]))
+```
+
+> add 메서드에서 this는 메서드를 호출한 객체를 가리킨다. `prefixer.add(...)` 방식으로 호출하기 때문
+>
+> Array.prototype.map으로 전달한 콜백 함수인 `funtion(item) {}` 은 일반 함수로 호출한다. 따라서 내부의 this는 undefined를 가리킨다.
+> 원래는 일반 함수 내부의 this는 전역 객체를 가리키지만, 클래스 내부의 모든 코드는 strict mode가 적용되기 때문에 undefined가 바인딩되는 것이다.
+
+
+
+위 문제를 해결하기 위해 ES6 이전에 했던 작업
+
+```js
+// ...
+add(arr) {
+    var that = this
+    return arr.map(function(item) {
+        return that.prefix + item
+    })
+}
+
+// map은 두번째 인자로 콜백함수의 this와 바인딩 할 객체를 전달할 수 있다.
+add(arr) {
+    return arr.map(function(item) {
+        return this.prefix + item
+    }, this)
+}
+
+// bind 메서드를 이용해 바인딩
+add(arr) {
+    return arr.map(function(item) {
+        return this.prefix + item
+    }.bind(this))
+}
+```
+
+
+
+ES6 화살표 함수 도입 후
+
+```js
+class Perfixer {
+    constructor(prefix) {
+        this.prefix = prefix
+    }
+    
+    add(arr) {
+        return arr.map((item) => this.prefix + item)
+    }
+}
+
+const prefixer = new Prefixer("-webkit-")
+console.log(prefixer.add(["transition", "user-select"]))
+```
+
+> 화살표 함수는 함수 자체의 this 바인딩을 갖지 않는다.
+> 화살표 함수 내부에서 this를 참조하면, 상위 스코프로 이동하여 this를 찾아 참조한다.
+>
+> 이를 렉시컬 this라고 한다.
+
+
+
+### Rest 파라미터
+
+Rest 파라미터는 함수에 전달된 인수의 목록을 배열로 전달받는다.
+
+```js
+function foo(...rest) {
+    console.log(rest)	// [1, 2, 3, 4]
+}
+
+foo(1, 2, 3, 4)
+```
+
+> 가변 인자 함수의 인수 목록을 배열로 전달받을 수 있어 편리하다.
+
