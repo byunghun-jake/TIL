@@ -1862,4 +1862,267 @@ foo(1, 2, 3, 4)
 
 
 
-배열의 배열 요소
+배열 삭제
+
+- `delete` 연산자를 사용하여 특정 위치의 요소를 삭제할 수 있다.
+  하지만, 이때 배열은 희소배열이 되며 length 프로퍼티 값은 변하지 않는다.
+
+  ```js
+  const arr = [1, 2, 3]
+  delete arr[2]
+  console.log(arr)		// [1, 2, empty]
+  console.log(arr.length)	// 3
+  ```
+
+  > 배열의 요소를 삭제할 때에는 `delete`연산자를 쓰지 말자
+
+- `Array.prototype.splice`
+  배열의 요소를 삭제할 때에는 splice 사용!
+
+  ```js
+  const arr = [1, 2, 3]
+  arr.splice(2, 1)	// [3]
+  console.log(arr)	// [1, 2]
+  ```
+
+
+
+### 배열 메서드
+
+배열의 메서드는 1. 원본 배열에 영향을 주는 2. 원본 배열에 영향을 주지 않는 메서드로 나누어진다.
+
+#### Array.isArray
+
+```js
+// true
+Array.isArray([])
+
+// false
+Array.isArray({})
+```
+
+
+
+#### 검색
+
+##### Array.prototype.indexOf
+
+```js
+const arr = [1, 3, 3, 5, 7]
+// 앞에서 부터 첫번째로 검색된 요소의 인덱스를 반환한다.
+console.log(arr.indexOf(3))	// 1
+// 값이 존재하지 않는 경우 -1을 반환한다.
+console.log(arr.indexOf(9))	// -1
+// 두번째 인자로 검색 시작 위치를 결정할 수 있다.
+console.log(arr.indexOf(3, 2))	// 2
+```
+
+
+
+##### ❤️ Array.prototype.includes
+
+```js
+const arr = [1, 3, 3, 5, 7]
+console.log(arr.includes(3))	// true
+console.log(arr.includes(9))	// false
+```
+
+
+
+#### 추가
+
+##### Array.prototype.push
+
+- 성능이 좋지 않다.
+
+```js
+const arr = [1, 2]
+arr.push(3)
+```
+
+
+
+##### Array.prototype.unshift
+
+```js
+const arr = [1, 2]
+arr.unshift(0)
+console.lot(arr)	// [0, 1, 2]
+```
+
+
+
+##### Array.prototype.concat
+
+인수로 전달된 값을 원본 배열의 마지막 요소로 추가한 "새로운 배열"을 반환한다.
+
+```js
+const arr = [1, 2]
+console.log(arr.concat(-1, 0))		// [1, 2, -1, 0]
+console.log([-1, 0].concat(arr))	// [-1, 0, 1, 2]
+
+const arr2 = [3, 4]
+console.log(arr.concat(arr2))		// [1, 2, 3, 4]
+```
+
+
+
+##### ❤️ 스프레드 문법
+
+스프레드 문법을 활용하여 요소를 추가하는 편이 좋다.
+
+```js
+const arr = [1, 2]
+const newArr = [...arr, 3]	// [1, 2, 3]
+const newArr2 = [0, ...arr]	// [0, 1, 2]
+```
+
+
+
+#### 제거
+
+##### Array.prototype.pop
+
+배열 마지막 요소를 제거하고 반환한다.
+
+```js
+const arr = [1, 2, 10000]
+arr.pop()
+```
+
+
+
+#### 변경
+
+##### Array.prototype.flat
+
+```js
+[1, [2, [3, [4]]]].flat()			// [1, 2, [3, [4]]]
+[1, [2, [3, [4]]]].flat(2)			// [1, 2, 3, [4]]
+[1, [2, [3, [4]]]].flat().flat()	// [1, 2, 3, [4]]
+
+[1, [2, [3, [4]]]].flat(Infinity)	// [1, 2, 3, 4]
+```
+
+
+
+#### 고차함수
+
+##### ❤️ Array.prototype.sort
+
+```js
+const arr = [1, 4, 100, 20, 30]
+[...arr].sort()		// [1, 100, 20, 30, 4]
+```
+
+sort 메서드의 인자로 비교함수를 전달해야 한다.
+비교함수는 양수나 음수 또는 0을 반환해야 한다.
+
+- 반환값이 음수: 비교 함수의 첫번째 인자를 우선 정렬
+- 반환값이 0: 정렬하지 않음
+- 반환값이 양수: 비교 함수의 두번째 인자를 우선 정렬
+
+```js
+const arr = [1, 4, 100, 20, 30]
+[...arr].sort((num1, num2) => num1 - num2)	// 더 큰수가 뒤로 [1, 4, 20, 30, 100]
+
+const todos = [
+    {id: 1, content: "JavaScript"},
+    {id: 10, content: "HTML"},
+    {id: 3, content: "CSS"},
+]
+
+function compare(key) {
+    return (a, b) => (a[key] < b[key] ? -1 : (a[key] > b[key] ? 1 : 0))
+}
+
+[...todos].sort(compare("id"))		// id 기준 오름차순으로 정렬
+[...todos].sort(compare("content"))	// content 기준 오름차순 정렬
+```
+
+
+
+##### ❤️ Array.prototype.forEach
+
+> 배열 순회
+
+```js
+const arr = [1, 4, 100, 20, 30]
+arr.forEach((value, index, array) => {
+    console.log(`value: ${value}, index: ${index}, array: ${JSON.stringify(array)}`)
+})
+```
+
+
+
+##### ❤️ Array.prototype.map
+
+> 콜백 함수가 반환하는 요소로 구성된 새로운 배열 생성
+
+```js
+let lengths = ["Bilbo", "Gandalf", "Nazgul"].map(item => item.length)
+console.log(lengths)	// [5, 7, 6]
+```
+
+
+
+##### ❤️ Array.prototype.filter
+
+> 콜백 함수의 반환값이 truthy인 요소로 구성된 새로운 배열 생성
+
+```js
+Class Users {
+    constructor() {
+        this.users = [
+          {id: 1, name: "John"},
+          {id: 2, name: "Pete"},
+          {id: 3, name: "Mary"}
+        ]
+    }
+    
+    findById(id) {
+        return this.users.filter((user) => user.id === id)
+    }
+    
+    remove(id) {
+        this.users = this.users.filter((user) => user.id !== id)
+    }
+}
+```
+
+
+
+##### ❤️ ❤️ Array.prototype.reduce
+
+> 콜백 함수의 반환값을 다음 순회 시, 콜백 함수의 첫 번째 인수로 전달한다.
+>
+> 배열을 순회하여 하나의 결과값을 구하는 경우에 사용한다.
+
+```js
+const sum = [1, 2, 3, 4].reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+// reduce 메서드의 첫 번째 인수: 콜백 함수
+// reduce 메서드의 두 번째 인수: 초기값
+```
+
+
+
+평균 구하기
+
+```js
+// 평균 구하기
+const avarage = [1, 2, 3, 4]
+	.reduce((acc, value, idx, arr) => idx === arr.length - 1 ? (acc + value) / arr.length : acc + value, 0)
+
+// 최대값 구하기
+const maxValue = [1, 2, 3, 4]
+	.reduce((acc, value) => acc > value ? acc : value, 0)
+
+// 요소의 중복 횟수 구하기
+const fruits = ["banana", "apple", "orange", "orange", "apple"]
+const count = fruits
+	.reduce((acc, val) => {
+        acc[val] = (acc[val] || 0) + 1
+        return acc
+    }, {})
+```
+
